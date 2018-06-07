@@ -17,7 +17,7 @@ public abstract class AbsImplicitMatcher extends AbsMatcher {
     }
 
     @Override
-    public Object generate(Context context, Uri uri, @Nullable Class<?> target) {
+    public Object generate(Context context, Uri uri, @Nullable Class<?> target, boolean intentOrFragment) {
         return new Intent(Intent.ACTION_VIEW, uri);
     }
 

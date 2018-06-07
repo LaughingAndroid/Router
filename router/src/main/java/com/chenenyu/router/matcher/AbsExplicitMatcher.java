@@ -19,7 +19,7 @@ public abstract class AbsExplicitMatcher extends AbsMatcher {
     }
 
     @Override
-    public Object generate(Context context, Uri uri, @Nullable Class<?> target) {
+    public Object generate(Context context, Uri uri, @Nullable Class<?> target,boolean intentOrFragment) {
         if (target == null) {
             return null;
         }

@@ -129,7 +129,7 @@ class RealRouter extends AbsRouter {
                     if (intercept(source, assembleClassInterceptors(entry.getValue()))) {
                         return null;
                     }
-                    Object result = matcher.generate(context, mRouteRequest.getUri(), entry.getValue());
+                    Object result = matcher.generate(context, mRouteRequest.getUri(), entry.getValue(), false);
                     if (result instanceof Fragment) {
                         Fragment fragment = (Fragment) result;
                         Bundle bundle = mRouteRequest.getExtras();
@@ -239,7 +239,7 @@ class RealRouter extends AbsRouter {
             return null;
         }
         // 2. generate
-        Object result = matcher.generate(context, mRouteRequest.getUri(), target);
+        Object result = matcher.generate(context, mRouteRequest.getUri(), target, true);
         // 3. assemble
         if (result instanceof Intent) {
             Intent intent = (Intent) result;
@@ -335,10 +335,10 @@ class RealRouter extends AbsRouter {
     }
 
     @Override
-    public void go(Context context) {
+    public boolean go(Context context) {
         Intent intent = getIntent(context);
         if (intent == null) {
-            return;
+            return false;
         }
 
         Bundle options = mRouteRequest.getActivityOptionsBundle();
@@ -364,19 +364,20 @@ class RealRouter extends AbsRouter {
         }
 
         callback(RouteResult.SUCCEED, null);
+        return true;
     }
 
     @Override
-    public void go(Fragment fragment) {
+    public boolean go(Fragment fragment) {
         FragmentActivity activity = fragment.getActivity();
         if (activity == null) {
             callback(RouteResult.FAILED, "The FragmentActivity this fragment is currently associated with is null.");
-            return;
+            return false;
         }
 
         Intent intent = getIntent(fragment);
         if (intent == null) {
-            return;
+            return false;
         }
 
         Bundle options = mRouteRequest.getActivityOptionsBundle();
@@ -392,19 +393,20 @@ class RealRouter extends AbsRouter {
         }
 
         callback(RouteResult.SUCCEED, null);
+        return true;
     }
 
     @Override
-    public void go(android.app.Fragment fragment) {
+    public boolean go(android.app.Fragment fragment) {
         Activity activity = fragment.getActivity();
         if (activity == null) {
             callback(RouteResult.FAILED, "The FragmentActivity this fragment is currently associated with is null.");
-            return;
+            return false;
         }
 
         Intent intent = getIntent(fragment);
         if (intent == null) {
-            return;
+            return false;
         }
 
         Bundle options = mRouteRequest.getActivityOptionsBundle();
@@ -428,5 +430,6 @@ class RealRouter extends AbsRouter {
         }
 
         callback(RouteResult.SUCCEED, null);
+        return true;
     }
 }

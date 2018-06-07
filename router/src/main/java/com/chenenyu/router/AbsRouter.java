@@ -223,20 +223,20 @@ abstract class AbsRouter implements IRouter {
     }
 
     @Override
-    public void go(Context context, RouteCallback callback) {
+    public boolean go(Context context, RouteCallback callback) {
         mRouteRequest.setRouteCallback(callback);
-        go(context);
+        return go(context);
     }
 
     @Override
-    public void go(Fragment fragment, RouteCallback callback) {
+    public boolean go(Fragment fragment, RouteCallback callback) {
         mRouteRequest.setRouteCallback(callback);
-        go(fragment);
+        return go(fragment);
     }
 
     @Override
-    public void go(android.app.Fragment fragment, RouteCallback callback) {
+    public boolean go(android.app.Fragment fragment, RouteCallback callback) {
         mRouteRequest.setRouteCallback(callback);
-        go(fragment);
+        return go(fragment);
     }
 }

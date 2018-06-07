@@ -31,5 +31,5 @@ interface Matcher extends Comparable<Matcher> {
      * @param target  Route target. Activity or Fragment.
      * @return An object(intent/fragment) that the matcher generated.
      */
-    Object generate(Context context, Uri uri, @Nullable Class<?> target);
+    Object generate(Context context, Uri uri, @Nullable Class<?> target, boolean intentOrFragment);
 }

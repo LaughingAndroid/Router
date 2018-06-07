@@ -16,7 +16,7 @@ import java.util.Map;
  * <p>
  * Created by chenenyu on 2017/3/13.
  */
-class AptHub {
+public class AptHub {
     private static final String PACKAGE_NAME = "com.chenenyu.router";
     private static final String DOT = ".";
     private static final String ROUTE_TABLE = "RouteTable";
@@ -33,6 +33,10 @@ class AptHub {
     static Map<String, RouteInterceptor> interceptorInstances = new HashMap<>();
     // injector's name -> injector
     static Map<String, Class<ParamInjector>> injectors = new HashMap<>();
+
+    public static Map<String, Class<?>> getRouteTable() {
+        return routeTable;
+    }
 
     /**
      * This method offers an ability to register modules for developers.

@@ -114,15 +114,15 @@ public interface IRouter {
      */
     Object getFragment(Object source);
 
-    void go(Context context, RouteCallback callback);
+    boolean go(Context context, RouteCallback callback);
 
-    void go(Context context);
+    boolean go(Context context);
 
-    void go(Fragment fragment, RouteCallback callback);
+    boolean go(Fragment fragment, RouteCallback callback);
 
-    void go(Fragment fragment);
+    boolean go(Fragment fragment);
 
-    void go(android.app.Fragment fragment, RouteCallback callback);
+    boolean go(android.app.Fragment fragment, RouteCallback callback);
 
-    void go(android.app.Fragment fragment);
+    boolean go(android.app.Fragment fragment);
 }
