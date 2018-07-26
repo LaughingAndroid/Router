@@ -40,7 +40,17 @@ public class RouteRequest implements Parcelable {
     private int exitAnim = INVALID_CODE;
     @Nullable
     private Bundle activityOptionsBundle;
+    public int callbackId = 0;
+    public static int CALLBACK_ID = 0;
 
+    public void setCallbackId() {
+        CALLBACK_ID++;
+        this.callbackId = CALLBACK_ID;
+    }
+
+    public int getCallbackId() {
+        return callbackId;
+    }
 
     public RouteRequest(Uri uri) {
         this.uri = uri;
@@ -143,6 +153,11 @@ public class RouteRequest implements Parcelable {
 
     public void setRouteCallback(@Nullable RouteCallback routeCallback) {
         this.routeCallback = routeCallback;
+        int temp = callbackId;
+        if (temp > 0) {
+            Router.remove(temp);
+        }
+        setCallbackId();
     }
 
     public int getRequestCode() {

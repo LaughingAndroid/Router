@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.chenenyu.router.matcher.AbsExplicitMatcher;
 import com.chenenyu.router.matcher.AbsImplicitMatcher;
@@ -68,8 +69,8 @@ class RealRouter extends AbsRouter {
         if (result != RouteResult.SUCCEED) {
             RLog.w(msg);
         }
-        if (mRouteRequest.getRouteCallback() != null) {
-            mRouteRequest.getRouteCallback().callback(result, mRouteRequest.getUri(), msg);
+        if (result == RouteResult.SUCCEED && mRouteRequest.getRouteCallback() != null) {
+            Router.addCallback(mRouteRequest);
         }
     }
 
@@ -161,6 +162,7 @@ class RealRouter extends AbsRouter {
 
     @Override
     public Intent getIntent(Object source) {
+        RLog.i("getIntent uri = " + mRouteRequest.getUri());
         if (mRouteRequest.getUri() == null) {
             callback(RouteResult.FAILED, "uri == null.");
             return null;
@@ -178,6 +180,8 @@ class RealRouter extends AbsRouter {
                 context = ((android.app.Fragment) source).getActivity();
             }
         }
+
+        RLog.i("getIntent context = " + context);
         if (context == null) {
             callback(RouteResult.FAILED, "Can't retrieve context from source.");
             return null;
@@ -195,6 +199,8 @@ class RealRouter extends AbsRouter {
         }
 
         List<AbsMatcher> matcherList = MatcherRegistry.getMatcher();
+        RLog.i("getIntent matcherList = " + matcherList);
+
         if (matcherList.isEmpty()) {
             callback(RouteResult.FAILED, "The MatcherRegistry contains no matcher.");
             return null;
@@ -234,12 +240,15 @@ class RealRouter extends AbsRouter {
      * @return finally intent.
      */
     private Intent generateIntent(Object source, Context context, AbsMatcher matcher, @Nullable Class<?> target) {
+        RLog.i("generateIntent intercept:" + target);
         // 1. intercept
         if (intercept(source, assembleClassInterceptors(target))) {
             return null;
         }
+
         // 2. generate
         Object result = matcher.generate(context, mRouteRequest.getUri(), target, true);
+        RLog.i("generateIntent matcher.generate result:" + result);
         // 3. assemble
         if (result instanceof Intent) {
             Intent intent = (Intent) result;
@@ -258,6 +267,7 @@ class RealRouter extends AbsRouter {
             if (mRouteRequest.getAction() != null) {
                 intent.setAction(mRouteRequest.getAction());
             }
+            RLog.i("generateIntent return:" + result);
             return intent;
         } else {
             callback(RouteResult.FAILED, String.format(
@@ -336,16 +346,20 @@ class RealRouter extends AbsRouter {
 
     @Override
     public boolean go(Context context) {
+        RLog.i("start create intent: ");
         Intent intent = getIntent(context);
+        RLog.i("intent: " + intent);
+
         if (intent == null) {
             return false;
         }
-
         Bundle options = mRouteRequest.getActivityOptionsBundle();
 
         if (context instanceof Activity) {
+
             ActivityCompat.startActivityForResult((Activity) context, intent,
                     mRouteRequest.getRequestCode(), options);
+            RLog.i("startActivityForResult: " + intent);
 
             if (mRouteRequest.getEnterAnim() >= 0 && mRouteRequest.getExitAnim() >= 0) {
                 // Add transition animation.
@@ -353,6 +367,7 @@ class RealRouter extends AbsRouter {
                         mRouteRequest.getEnterAnim(), mRouteRequest.getExitAnim());
             }
         } else {
+            RLog.i("FLAG_ACTIVITY_NEW_TASK: " + intent);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             // The below api added in v4:25.1.0
             // ContextCompat.startActivity(context, intent, options);
@@ -361,72 +376,6 @@ class RealRouter extends AbsRouter {
             } else {
                 context.startActivity(intent);
             }
-        }
-
-        callback(RouteResult.SUCCEED, null);
-        return true;
-    }
-
-    @Override
-    public boolean go(Fragment fragment) {
-        FragmentActivity activity = fragment.getActivity();
-        if (activity == null) {
-            callback(RouteResult.FAILED, "The FragmentActivity this fragment is currently associated with is null.");
-            return false;
-        }
-
-        Intent intent = getIntent(fragment);
-        if (intent == null) {
-            return false;
-        }
-
-        Bundle options = mRouteRequest.getActivityOptionsBundle();
-        if (mRouteRequest.getRequestCode() < 0) {
-            fragment.startActivity(intent, options);
-        } else {
-            fragment.startActivityForResult(intent, mRouteRequest.getRequestCode(), options);
-        }
-        if (mRouteRequest.getEnterAnim() >= 0 && mRouteRequest.getExitAnim() >= 0) {
-            // Add transition animation.
-            activity.overridePendingTransition(
-                    mRouteRequest.getEnterAnim(), mRouteRequest.getExitAnim());
-        }
-
-        callback(RouteResult.SUCCEED, null);
-        return true;
-    }
-
-    @Override
-    public boolean go(android.app.Fragment fragment) {
-        Activity activity = fragment.getActivity();
-        if (activity == null) {
-            callback(RouteResult.FAILED, "The FragmentActivity this fragment is currently associated with is null.");
-            return false;
-        }
-
-        Intent intent = getIntent(fragment);
-        if (intent == null) {
-            return false;
-        }
-
-        Bundle options = mRouteRequest.getActivityOptionsBundle();
-        if (mRouteRequest.getRequestCode() < 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) { // 4.1
-                fragment.startActivity(intent, options);
-            } else {
-                fragment.startActivity(intent);
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) { // 4.1
-                fragment.startActivityForResult(intent, mRouteRequest.getRequestCode(), options);
-            } else {
-                fragment.startActivityForResult(intent, mRouteRequest.getRequestCode());
-            }
-        }
-        if (mRouteRequest.getEnterAnim() >= 0 && mRouteRequest.getExitAnim() >= 0) {
-            // Add transition animation.
-            activity.overridePendingTransition(
-                    mRouteRequest.getEnterAnim(), mRouteRequest.getExitAnim());
         }
 
         callback(RouteResult.SUCCEED, null);

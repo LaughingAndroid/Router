@@ -117,12 +117,4 @@ public interface IRouter {
     boolean go(Context context, RouteCallback callback);
 
     boolean go(Context context);
-
-    boolean go(Fragment fragment, RouteCallback callback);
-
-    boolean go(Fragment fragment);
-
-    boolean go(android.app.Fragment fragment, RouteCallback callback);
-
-    boolean go(android.app.Fragment fragment);
 }

@@ -10,6 +10,7 @@ import android.os.PersistableBundle;
 import android.support.annotation.AnimRes;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.chenenyu.router.util.RLog;
@@ -36,7 +37,10 @@ abstract class AbsRouter implements IRouter {
 
     @Override
     public IRouter callback(RouteCallback callback) {
-        mRouteRequest.setRouteCallback(callback);
+        if (callback!=null) {
+            mRouteRequest.setRouteCallback(callback);
+            with(Router.CALLBACK_ID, mRouteRequest.getCallbackId());
+        }
         return this;
     }
 
@@ -76,6 +80,8 @@ abstract class AbsRouter implements IRouter {
     @SuppressWarnings("unchecked")
     @Override
     public IRouter with(String key, Object value) {
+        Log.e("route_request", "with:" + key + " value:" + value);
+
         if (value == null) {
             RLog.w("Ignored: The extra value is null.");
             return this;
@@ -224,19 +230,10 @@ abstract class AbsRouter implements IRouter {
 
     @Override
     public boolean go(Context context, RouteCallback callback) {
-        mRouteRequest.setRouteCallback(callback);
+        if (callback != null) {
+            mRouteRequest.setRouteCallback(callback);
+            with(Router.CALLBACK_ID, mRouteRequest.getCallbackId());
+        }
         return go(context);
-    }
-
-    @Override
-    public boolean go(Fragment fragment, RouteCallback callback) {
-        mRouteRequest.setRouteCallback(callback);
-        return go(fragment);
-    }
-
-    @Override
-    public boolean go(android.app.Fragment fragment, RouteCallback callback) {
-        mRouteRequest.setRouteCallback(callback);
-        return go(fragment);
     }
 }

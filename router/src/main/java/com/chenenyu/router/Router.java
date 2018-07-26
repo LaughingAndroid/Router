@@ -1,6 +1,7 @@
 package com.chenenyu.router;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.chenenyu.router.matcher.AbsMatcher;
 import com.chenenyu.router.template.InterceptorTable;
@@ -9,7 +10,9 @@ import com.chenenyu.router.template.TargetInterceptors;
 import com.chenenyu.router.util.RLog;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Entry class.
@@ -21,6 +24,7 @@ public class Router {
      * You can get the raw uri in target page by call <code>intent.getStringExtra(Router.RAW_URI)</code>.
      */
     public static final String RAW_URI = "raw_uri";
+    public static final String CALLBACK_ID = "router_call_back_id";
 
     private static List<RouteInterceptor> sGlobalInterceptors = new ArrayList<>();
 
@@ -97,5 +101,27 @@ public class Router {
 
     public static void clearMatcher() {
         MatcherRegistry.clear();
+    }
+
+
+    public static Map<Integer, RouteRequest> mRouteRequests = new Hashtable<>();
+
+    public static void callback(int id, Object... objects) {
+        if (mRouteRequests.containsKey(id)) {
+            RouteRequest req = mRouteRequests.get(id);
+            RouteCallback callback = req.getRouteCallback();
+            if (callback != null) {
+                callback.call(req, objects);
+            }
+        }
+    }
+
+    public static int addCallback(RouteRequest req) {
+        mRouteRequests.put(req.getCallbackId(), req);
+        return req.callbackId;
+    }
+
+    public static void remove(int id) {
+        mRouteRequests.remove(id);
     }
 }

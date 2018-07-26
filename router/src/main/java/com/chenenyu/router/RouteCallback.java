@@ -1,6 +1,5 @@
 package com.chenenyu.router;
 
-import android.net.Uri;
 
 import java.io.Serializable;
 
@@ -10,11 +9,10 @@ import java.io.Serializable;
  */
 public interface RouteCallback extends Serializable {
     /**
-     * Callback
+     * 功能性回调
      *
-     * @param state   {@link RouteResult}
-     * @param uri     Uri
-     * @param message notice msg
+     * @param req
+     * @param objects
      */
-    void callback(RouteResult state, Uri uri, String message);
+    void call(RouteRequest req, Object... objects);
 }
