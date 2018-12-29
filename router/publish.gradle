@@ -4,7 +4,7 @@ publish {
     userOrg = 'mchwind'
     groupId = 'com.kibey'
     artifactId = 'router'
-    publishVersion = '0.0.2'
+    publishVersion = '0.0.4'
     desc = 'A router lib.'
     website = 'https://github.com/LaughingAndroid/router'
     repoName = 'kblib'

@@ -6,3 +6,4 @@ build
 *.iml
 /captures
 .externalNativeBuild
+/release.sh

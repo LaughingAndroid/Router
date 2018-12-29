@@ -106,12 +106,24 @@ public class Router {
 
     public static Map<Integer, RouteRequest> mRouteRequests = new Hashtable<>();
 
-    public static void callback(int id, Object... objects) {
+    public static void callbacks(int id, Object... objects) {
+        if (null != objects) {
+            ArrayList list = new ArrayList();
+            for (Object object : objects) {
+                list.add(object);
+            }
+            callback(id, list);
+        } else {
+            callback(id, null);
+        }
+    }
+
+    public static void callback(int id, ArrayList list) {
         if (mRouteRequests.containsKey(id)) {
             RouteRequest req = mRouteRequests.get(id);
             RouteCallback callback = req.getRouteCallback();
             if (callback != null) {
-                callback.call(req, objects);
+                callback.call(req, list);
             }
         }
     }
